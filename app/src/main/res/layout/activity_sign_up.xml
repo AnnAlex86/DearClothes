@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout
+
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <Space
+            android:layout_width="match_parent"
+            android:layout_height="75dp"/>
+    <ImageButton
+            android:layout_width="150dp"
+            android:layout_height="150dp" app:srcCompat="@drawable/avatar" android:id="@+id/avatarButton"
+            android:scaleType="centerCrop" android:background="#FFFFFF" android:layout_gravity="center"
+    />
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/error_photo" android:textColor="#BD0202"/>
+    <TextView
+            android:text="@string/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/username"
+            android:textStyle="bold"/>
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/username_enter" android:hint="@string/enter_name"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/error_username" android:textColor="#BD0202"/>
+    <TextView
+            android:text="@string/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/email"
+            android:textStyle="bold"/>
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/email_enter" android:hint="@string/enter_email"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/error_email" android:textColor="#BD0202"/>
+    <TextView
+            android:text="@string/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/password"/>
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/enter_password" android:hint="@string/enter_password"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:textColor="#BD0202"
+            android:layout_height="wrap_content" android:id="@+id/error_password"/>
+    <com.hbb20.CountryPickerView
+            android:id="@+id/countryPicker"
+            android:layout_width="wrap_content"
+            app:cp_initialSelectionMode="specificCountry"
+            app:cp_initialSpecificCountry="RU"
+            android:layout_height="wrap_content">
+    </com.hbb20.CountryPickerView>
+    <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+    <Button
+            android:text="@string/detectCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/location"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/error_city" android:textColor="#BD0202"/>
+
+    <TextView
+            android:text="@string/bio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/bio"
+            android:textStyle="bold"/>
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/enter_bio" android:hint="@string/enter_bio"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/error_bio" android:textColor="#BD0202"/>
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/button_signup"
+            tools:text="@string/signup" android:gravity="center" android:text="@string/signup"/>
+    <Button
+            android:text="@string/signinUnderlined"
+            android:layout_width="match_parent"
+            android:background="@android:color/transparent"
+            android:layout_height="wrap_content" android:id="@+id/button2" android:textSize="14sp"
+    />
+
+</LinearLayout>
+</ScrollView>

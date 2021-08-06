@@ -1,0 +1,132 @@
+<resources>
+
+    <string name="app_name">My Application</string>
+    <string name="action_process">PROCESS</string>
+    <string name="action_choose_image">CHOOSE IMAGE</string>
+    <string name="message_tap_to_choose_image">Tap to choose image</string>
+    <string name="error_no_image_selected">No image selected</string>
+    <string name="title_permission">Permission</string>
+    <string name="message_permission">To save processed image, we need access to your external storage</string>
+    <string name="action_ok">OK</string>
+    <string name="error_permission">Can\'t process image without storage permission</string>
+    <string name="title_error">Error</string>
+    <string name="status_uploading">Uploading..</string>
+    <string name="status_processing">Processing…</string>
+    <string name="error_output_not_saved">Output image not saved</string>
+    <string name="enter_name">Please type username</string>
+    <string name="username">Username</string>
+    <string name="enter_email">Please type Email address</string>
+    <string name="email">Email</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="bio">Bio</string>
+    <string name="enter_bio">Please type bio</string>
+    <string name="signup">Sign Up</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Please type password</string>
+    <string name="signin">Sign In</string>
+    <string name="errorPhoto">Upload a photo</string>
+    <string name="errorUsername">Fill the username</string>
+    <string name="errorEmail">Fill the Email</string>
+    <string name="errorPassword">Fill the password</string>
+    <string name="errorCity">You should detect your city</string>
+    <string name="errorBio">Fill the bio</string>
+    <string name="detectCity">Locate city</string>
+    <string name="signinUnderlined"><u>Sign In</u></string>
+    <string name="errorDownloadPhoto">An error occurred with uploading a photo</string>
+    <string-array name="regionsRu">
+        <item>Белгородская область</item>
+        <item>Брянская область</item>
+        <item>Владимирская область</item>
+        <item>Воронежская область</item>
+        <item>Ивановская область</item>
+        <item>Калужская область</item>
+        <item>Костромская область</item>
+        <item>Курская область</item>
+        <item>Липецкая область</item>
+        <item>Московская область</item>
+        <item>Орловская область</item>
+        <item>Рязанская область</item>
+        <item>Смоленская область</item>
+        <item>Тамбовская область</item>
+        <item>Тверская область</item>
+        <item>Тульская область</item>
+        <item>Ярославская область</item>
+        <item>город Москва</item>
+        <item>Белгородская область</item>
+        <item>Республика Карелия</item>
+        <item>Республика Коми</item>
+        <item>Архангельская область</item>
+        <item>Вологодская область</item>
+        <item>Калининградская область</item>
+        <item>Ленинградская область</item>
+        <item>Мурманская область</item>
+        <item>Новгородская область</item>
+        <item>Псковская область</item>
+        <item>город Санкт-Петербург</item>
+        <item>Ненецкий автономный округ</item>
+        <item>Республика Адыгея</item>
+        <item>Республика Калмыкия</item>
+        <item>Краснодарский край</item>
+        <item>Астраханская область</item>
+        <item>Волгоградская область</item>
+        <item>Ростовская область</item>
+        <item>Республика Дагестан</item>
+        <item>Республика Ингушетии</item>
+        <item>Кабардино-Балкарская Республика</item>
+        <item>Карачаево-Черкесская Республика</item>
+        <item>Республика Северная Осетия-Алания</item>
+        <item>Чеченская Республика</item>
+        <item>Ставропольский край</item>
+        <item>Республика Башкортостан</item>
+        <item>Республика Марий Эл</item>
+        <item>Республика Мордовии</item>
+        <item>Республика Татарстан</item>
+        <item>Удмуртская Республики</item>
+        <item>Чувашская Республики</item>
+        <item>Пермский край</item>
+        <item>Кировская область</item>
+        <item>Нижегородская область</item>
+        <item>Оренбургская область</item>
+        <item>Пензенская область</item>
+        <item>Самарская область</item>
+        <item>Саратовская область</item>
+        <item>Ульяновская область</item>
+        <item>Курганская область</item>
+        <item>Свердловская область</item>
+        <item>Тюменская область</item>
+        <item>Челябинская область</item>
+        <item>Ханты-Мансийский автономный округ - Югра</item>
+        <item>Ямало-Ненецкий автономный округ</item>
+        <item>Республика Алтай</item>
+        <item>Республика Бурятия</item>
+        <item>Республика Тыва</item>
+        <item>Республика Хакасия</item>
+        <item>Алтайский край</item>
+        <item>Забайкальский край</item>
+        <item>Красноярский край</item>
+        <item>Иркутская область</item>
+        <item>Кемеровская область</item>
+        <item>Новосибирская область</item>
+        <item>Омская область</item>
+        <item>Томская область</item>
+        <item>Республика Саха (Якутия)</item>
+        <item>Камчатский край</item>
+        <item>Приморский край</item>
+        <item>Хабаровский край</item>
+        <item>Амурская область</item>
+        <item>Магаданская область</item>
+        <item>Сахалинская область</item>
+        <item>Еврейская автономная область</item>
+        <item>Чукотский автономный округ</item>
+        <item>Республика Крым</item>
+        <item>город Севастополь</item>
+    </string-array>
+</resources>

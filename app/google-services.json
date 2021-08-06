@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "165282189254",
+    "project_id": "dear-clothes",
+    "storage_bucket": "dear-clothes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165282189254:android:30a08fda0c74e677692cc7",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "165282189254-ali2g0hlarovcvic2qac7l329fsb1svr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzqObbuR6_9xjg_qQ9qmQe8JY1Q4oAvmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "165282189254-ali2g0hlarovcvic2qac7l329fsb1svr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
