@@ -31,15 +31,20 @@
     <string name="signup">Sign Up</string>
     <string name="password">Password</string>
     <string name="enter_password">Please type password</string>
-    <string name="signin">Sign In</string>
+    <string name="signIn">Sign In</string>
     <string name="errorPhoto">Upload a photo</string>
     <string name="errorUsername">Fill the username</string>
     <string name="errorEmail">Fill the Email</string>
     <string name="errorPassword">Fill the password</string>
     <string name="errorCity">You should detect your city</string>
     <string name="errorBio">Fill the bio</string>
+    <string name="checkEmail">Confirm your email and log in to your account</string>
     <string name="detectCity">Locate city</string>
+    <string name="chooseImage">Choose image from</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
     <string name="signinUnderlined"><u>Sign In</u></string>
+    <string name="signupUnderlined"><u>Sign Up</u></string>
     <string name="errorDownloadPhoto">An error occurred with uploading a photo</string>
     <string-array name="regionsRu">
         <item>Белгородская область</item>
@@ -128,5 +133,105 @@
         <item>Чукотский автономный округ</item>
         <item>Республика Крым</item>
         <item>город Севастополь</item>
+    </string-array>
+    <string-array name="type_array">
+        <item>Clothes</item>
+        <item>Shoes</item>
+        <item>Accessories</item>
+        <item>Bag</item>
+    </string-array>
+    <string-array name="clothes_array">
+        <item>Coats and Jackets</item>
+        <item>Dresses</item>
+        <item>Hoodies and Sweatshirts</item>
+        <item>Jeans</item>
+        <item>Jumpers and Cardigans</item>
+        <item>Jumpsuits and Playsuits</item>
+        <item>Lingerie and Nightwear</item>
+        <item>Loungewear</item>
+        <item>Shorts</item>
+        <item>Skirts</item>
+        <item>Socks and Tights</item>
+        <item>Suits and Tailoring</item>
+        <item>Swimwear and Beachwear</item>
+        <item>Tops</item>
+        <item>Trousers and Leggings</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="shoes_array">
+        <item>Boots</item>
+        <item>Flat sandals</item>
+        <item>Flat shoes</item>
+        <item>Heels</item>
+        <item>Sandals</item>
+        <item>Sliders and Flip flops</item>
+        <item>Slippers</item>
+        <item>Trainers</item>
+        <item>Wide Fit</item>
+        <item>Ballet pumps</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="accessories_array">
+        <item>Belts</item>
+        <item>Hair accessories</item>
+        <item>Hats</item>
+        <item>Jewellery</item>
+        <item>Scarves</item>
+        <item>Sunglasses</item>
+        <item>Watches</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="bags_array">
+        <item>Handbags</item>
+        <item>Backpacks</item>
+        <item>Wallets</item>
+        <item>Duffle bags</item>
+        <item>Luggage</item>
+        <item>Lumbar packs</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="jewellery_array">
+        <item>Earrings</item>
+        <item>Bracelets</item>
+        <item>Necklaces</item>
+        <item>Rings</item>
+        <item>Charms</item>
+        <item>Pins and Brooches</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="hats_array">
+        <item>Beanies</item>
+        <item>Baseball hats</item>
+        <item>Trucker hats</item>
+        <item>Sun hats</item>
+        <item>Fedoras</item>
+        <item>Bucked hats</item>
+        <item>Earmuffs and Headbands</item>
+        <item>Cadet Hats And Newsboys</item>
+        <item>Trapper and Winter Hats</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="jacket_array">
+        <item>Down and Insulated coats</item>
+        <item>Blazers</item>
+        <item>Rain jackets and Trench coats</item>
+        <item>Fleece and Softshell jackets</item>
+        <item>Faux fur and Shearling coats</item>
+        <item>Ski and Snowboard jackets</item>
+        <item>Active jackets</item>
+        <item>Vests</item>
+        <item>Wool and Pea coats</item>
+        <item>Leather jackets</item>
+        <item>Jean jackets</item>
+        <item>Capes and Ponchos</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="lingerie_array">
+        <item>Bras</item>
+        <item>Panties</item>
+        <item>Camis</item>
+        <item>Shapewear and Slips</item>
+        <item>Lingerie</item>
+        <item>Other</item>
     </string-array>
 </resources>

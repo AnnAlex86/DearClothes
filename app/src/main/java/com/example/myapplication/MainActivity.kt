@@ -1,12 +1,18 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +25,8 @@ import butterknife.OnClick
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.esafirm.imagepicker.features.ImagePicker
+import com.github.drjacky.imagepicker.ImagePicker
+import com.karumi.dexter.BuildConfig
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
@@ -31,17 +38,32 @@ import com.theapache64.removebg.utils.ErrorResponse
 import com.theapache64.twinkill.logger.info
 import java.io.File
 import java.lang.StringBuilder
+import android.provider.MediaStore
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import android.os.Environment
+import java.io.FileOutputStream
+import java.lang.Exception
+import android.media.MediaScannerConnection
+
+import android.os.Build
+import android.util.Log
+import androidx.core.net.toFile
+import android.content.DialogInterface
+import android.database.Cursor
+import android.graphics.BitmapFactory
+import android.widget.Toast
+import com.squareup.okhttp.ConnectionSpec
+import com.squareup.okhttp.OkHttpClient
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val projectDir by lazy {
-        val rootPath = applicationContext.getExternalFilesDir(null)
-        File("$rootPath/remove-bg")
-    }
-    private var inputImage: File? = null
-    private var outputImage: File? = null
 
+    private var inputImage: File? = null
+    private var uri: Uri? = null
+    private var gallery = true
     @BindView(R.id.iv_input)
     lateinit var ivInput: ImageView
 
@@ -57,7 +79,8 @@ class MainActivity : AppCompatActivity() {
 
     @BindView(R.id.pb_progress)
     lateinit var pbProgress: ProgressBar
-
+    private lateinit var filePhoto: File
+    private val FILE_NAME = "photo.jpg"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -70,21 +93,46 @@ class MainActivity : AppCompatActivity() {
 
     @OnClick(R.id.b_choose_image, R.id.i_choose_image)
     fun onChooseImageClicked() {
+        val alertDialogBuilder = android.app.AlertDialog.Builder(this)
+        alertDialogBuilder.setMessage(R.string.chooseImage)
 
-        info("Choose inputImage clicked")
+            .setPositiveButton(R.string.gallery) { dialog, id ->
+                gallery = true
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED){
+                        val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        requestPermissions(permissions, PERMISSION_CODE)
+                    } else{
+                        chooseImageGallery();
 
-        ImagePicker.create(this)
-            .single()
-            .start()
+                    }
+                }else{
+                    chooseImageGallery();
+
+                }
+
+            }.setNegativeButton(R.string.camera){dialog, id ->
+                gallery = false
+                val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                filePhoto = getPhotoFile(FILE_NAME)
+
+
+                val providerFile =FileProvider.getUriForFile(this,"com.example.androidcamera.fileprovider", filePhoto)
+                takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerFile)
+                if (takePhotoIntent.resolveActivity(this.packageManager) != null){
+                    startActivityForResult(takePhotoIntent, REQUEST_CODE)
+                }else {
+                    Toast.makeText(this,"Camera could not open", Toast.LENGTH_SHORT).show()
+                }
+            }
+        val alert: android.app.AlertDialog = alertDialogBuilder.create()
+        alert.show()
+
+
+
     }
 
-    private fun appendInputDetails(details: String) {
-        tvInputDetails.text = "${tvInputDetails.text}\n$details"
-    }
 
-    private fun clearInputDetails() {
-        tvInputDetails.text = ""
-    }
 
     @OnClick(R.id.iv_input)
     fun onInputClicked() {
@@ -108,40 +156,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //@OnClick(R.id.b_process)
-   public fun onProcess() {
+   // @OnClick(R.id.b_process)
+   public fun onProcess(fileImage: File) {
         if (inputImage != null) {
 
             info("Image is ${inputImage!!.path}")
-
-            // Check permission
-            checkPermission {
-
-                info("Permission granted")
-
-                // permission granted, compress the inputImage now
-                compressImage(inputImage!!) { bitmap ->
-
-                    info("Image compressed")
-
-                    saveImage("${System.currentTimeMillis()}", bitmap) { compressedImage ->
-
-                        info("Compressed inputImage saved to ${compressedImage.absolutePath}, and removing bg...")
-                        val compressedImageSize = compressedImage.length() / 1024
-                        val originalImageSize = inputImage!!.length() / 1024
-
-                        pbProgress.visibility = View.VISIBLE
+            pbProgress.visibility = View.VISIBLE
                         tvProgress.visibility = View.VISIBLE
 
                         tvProgress.setText(R.string.status_uploading)
                         pbProgress.progress = 0
 
-                        val finalImage = if (compressedImageSize < originalImageSize) compressedImage else inputImage!!
-                        appendInputDetails("Compressed : ${finalImage.length() / 1024}KB")
-
-                        // inputImage saved, now upload
-                        if (finalImage != null)
-                        { RemoveBg.from(finalImage, object : RemoveBg.RemoveBgCallback {
+                        RemoveBg.from(fileImage, object : RemoveBg.RemoveBgCallback {
 
                             override fun onProcessing() {
                                 runOnUiThread {
@@ -178,23 +204,81 @@ class MainActivity : AppCompatActivity() {
                                     tvProgress.visibility = View.INVISIBLE
                                     pbProgress.visibility = View.INVISIBLE
 
-                                    // Save output image
-                                    saveImage("${inputImage!!.name}-no-bg", bitmap) {
-                                        outputImage = it
-                                    }
                                 }
                             }
 
                         })
-                    }}
-                }
-            }
+
 
         } else {
             toast(R.string.error_no_image_selected)
         }
     }
+    private fun getRealPathFromURI(contentURI: Uri): String? {
+        val result: String?
+        val cursor: Cursor? = contentResolver.query(contentURI, null, null, null, null)
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.path
+        } else {
+            cursor.moveToFirst()
+            val idx: Int = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+            result = cursor.getString(idx)
+            cursor.close()
+        }
+        return result
+    }
+    private fun chooseImageGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, IMAGE_CHOOSE)
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode){
+            PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    chooseImageGallery()
+                }else{
+                    Toast.makeText(this,"Permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(!gallery){
+            val takenPhoto = BitmapFactory.decodeFile(filePhoto.absolutePath)
 
+            bProcess.isVisible = true
+            ivInput.setImageBitmap(takenPhoto)
+            ivInput.isVisible = true
+            onProcess(filePhoto)
+        }
+
+        else{
+            uri = data?.data
+            inputImage = File(data?.data!!.path)
+            bProcess.isVisible = true
+            ivInput.setImageURI(data?.data)
+            ivInput.isVisible = true
+            onProcess(File(getRealPathFromURI(uri!!)))
+        }
+
+    }
+
+    companion object {
+        private val IMAGE_CHOOSE = 1000;
+        private val PERMISSION_CODE = 1001;
+        private val REQUEST_CODE = 13
+    }
+    private fun getPhotoFile(fileName: String): File {
+        val directoryStorage = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(fileName, ".jpg", directoryStorage)
+    }
     /**
      * To show an alert message with title 'Error'
      */
@@ -207,105 +291,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    /**
-     * To save given bitmap into a file
-     */
-    private fun saveImage(fileName: String, bitmap: Bitmap, onSaved: (file: File) -> Unit) {
-
-        // Create project dir
-        if (!projectDir.exists()) {
-            projectDir.mkdir()
-        }
-
-        // Create inputImage file
-        val imageFile = File("$projectDir/$fileName.jpg")
-        imageFile.outputStream().use { out ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
-            out.flush()
-        }
-
-        onSaved(imageFile)
-    }
-
-    /**
-     * To compress given inputImage file with Glide
-     */
-    private fun compressImage(image: File, onLoaded: (bitmap: Bitmap) -> Unit) {
-
-        Glide.with(this)
-            .asBitmap()
-            .load(image)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onLoadCleared(placeholder: Drawable?) {
-
-                }
-
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    onLoaded(resource)
-                }
-            })
-    }
-
-    /**
-     * To check WRITE_EXTERNAL_STORAGE permission
-     */
-    private fun checkPermission(onPermissionChecked: () -> Unit) {
-
-        val deniedListener = DialogOnDeniedPermissionListener.Builder.withContext(this)
-            .withTitle(R.string.title_permission)
-            .withMessage(R.string.message_permission)
-            .withButtonText(R.string.action_ok)
-            .build()
-
-        val permissionListener = object : BasePermissionListener() {
-            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                onPermissionChecked()
-            }
-
-            override fun onPermissionDenied(response: PermissionDeniedResponse?) {
-                toast(R.string.error_permission)
-            }
-        }
-
-        val listener = CompositePermissionListener(permissionListener, deniedListener)
-
-        Dexter.withActivity(this)
-            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            .withListener(listener)
-            .check()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-
-            // IMAGE PICKED!!
-            val imagePicked = ImagePicker.getFirstImageOrNull(data)
-
-            if (imagePicked != null) {
-
-                this.inputImage = File(imagePicked.path)
-                 onProcess()
-               // ivInput.visibility = View.VISIBLE
-
-                Glide.with(this)
-                    .load(this.inputImage)
-                    .into(ivInput)
-
-                // Showing process button
-                bProcess.visibility = View.VISIBLE
-
-                clearInputDetails()
-                appendInputDetails("Image : ${inputImage!!.name}")
-                appendInputDetails("Original Size : ${inputImage!!.length() / 1024}KB")
 
 
-            } else {
-                toast(R.string.error_no_image_selected)
-            }
 
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
 
     private fun toast(@StringRes message: Int) {
         toast(getString(message))

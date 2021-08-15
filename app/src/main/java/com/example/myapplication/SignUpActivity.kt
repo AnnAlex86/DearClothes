@@ -5,13 +5,16 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.*
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -45,6 +48,17 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.ExecutionException
+import com.google.firebase.FirebaseApp
+
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
+import com.google.firebase.auth.ktx.auth
+import java.io.FileInputStream
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import java.lang.Exception
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -69,6 +83,9 @@ class SignUpActivity : AppCompatActivity() {
     @BindView(R.id.error_bio)
     lateinit var errorBio: TextView
 
+    @BindView(R.id.error_signup)
+    lateinit var errorSignUp: TextView
+
     @BindView(R.id.avatarButton)
     lateinit var avatarButton: ImageButton
 
@@ -87,13 +104,16 @@ class SignUpActivity : AppCompatActivity() {
     @BindView(R.id.location)
     lateinit var locationButton: Button
 
+    @BindView(R.id.progressBar)
+    lateinit var progressBar: ProgressBar
+
     @BindView(R.id.error_city)
     lateinit var errorCity: TextView
     var avatar: Bitmap ?= null
     var imageUrl: String? = null
     var uri: Uri? = null
     var user: FirebaseUser ?= null
-    var auth: FirebaseAuth ?= null
+    var auth: FirebaseAuth = Firebase.auth
    /* @BindView(R.id.spinner_region)
     lateinit var spinnerRegion: Spinner*/
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -104,7 +124,12 @@ class SignUpActivity : AppCompatActivity() {
         ButterKnife.bind(this)
         setupCountryPickerView()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-     //   FirebaseApp.initializeApp( this)
+        FirebaseApp.initializeApp(this)
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        firebaseAppCheck.installAppCheckProviderFactory(
+            SafetyNetAppCheckProviderFactory.getInstance()
+        )
+        user = auth.currentUser
 
 
     }
@@ -114,8 +139,14 @@ class SignUpActivity : AppCompatActivity() {
 
       getLastKnownLocation()
     }
+    @OnClick(R.id.button_signin)
+    fun signIn() {
 
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent)
+    }
 
+    @SuppressLint("MissingPermission")
     fun getLastKnownLocation() {
 
 
@@ -166,13 +197,13 @@ class SignUpActivity : AppCompatActivity() {
                 toast((R.string.errorDownloadPhoto))
             }
         }
-    fun uploadAvatar(){
+    private fun uploadAvatar(){
 
         val bitmap = avatarButton.drawable.toBitmap()
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data: ByteArray = baos.toByteArray()
-        val fileName = UUID.randomUUID().toString() +".jpg"
+        val fileName = UUID.randomUUID().toString() +".jpeg"
         //  val database = FirebaseDatabase.getInstance()
         val storage = Firebase.storage("gs://dear-clothes.appspot.com")
 
@@ -187,7 +218,7 @@ class SignUpActivity : AppCompatActivity() {
                     }
                 })
 
-            ?.addOnFailureListener(OnFailureListener { e ->
+            .addOnFailureListener(OnFailureListener { e ->
                 print(e.message)
             })
     }
@@ -205,6 +236,7 @@ class SignUpActivity : AppCompatActivity() {
     @OnClick(R.id.button_signup)
     fun signUp() {
         if (checkFill()) createRegistration()
+        progressBar.visibility = View.VISIBLE
 
     }
 
@@ -215,7 +247,7 @@ class SignUpActivity : AppCompatActivity() {
          }
      }
 
-    fun checkFill(): Boolean{
+    private fun checkFill(): Boolean{
         var isFill = true
         if(enterEmail.text.toString().equals("")) {errorEmail.setText(R.string.errorEmail)
             isFill = false}
@@ -258,10 +290,10 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun toast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show();
     }
 
-    val PERMISSION_ID = 42
+    private val PERMISSION_ID = 42
     private fun checkPermission(vararg perm:String) : Boolean {
         val havePermissions = perm.toList().all {
             ContextCompat.checkSelfPermission(this,it) ==
@@ -289,9 +321,9 @@ class SignUpActivity : AppCompatActivity() {
         }
         return true
     }
-    fun createRegistration(){
+    private fun createRegistration(){
        auth = FirebaseAuth.getInstance();
-        auth!!.createUserWithEmailAndPassword(enterEmail.text.toString(), enterPassword.text.toString())
+        auth.createUserWithEmailAndPassword(enterEmail.text.toString(), enterPassword.text.toString())
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
@@ -302,8 +334,10 @@ class SignUpActivity : AppCompatActivity() {
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(enterUsername.text.toString())
                         .build()
-                   auth!!.signInWithEmailAndPassword(enterEmail.text.toString(), enterPassword.text.toString())
-                    checkUser()
+                  // auth.signInWithEmailAndPassword(enterEmail.text.toString(), enterPassword.text.toString())
+                  //  checkUser()
+
+
                     verifyEmail()
                     user!!.updateProfile(profileUpdates)
 
@@ -314,37 +348,24 @@ class SignUpActivity : AppCompatActivity() {
                    // updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
+                    //Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                   // Toast.makeText(baseContext, "Authentication failed.",
+                     //   Toast.LENGTH_SHORT).show()
                     //updateUI(null)
+                    try {
+                        throw task.exception!!
+                    } // if user enters wrong email.
+
+                     catch (e: Exception) {
+                       Log.d(TAG, "onComplete: " + e.message)
+                         errorSignUp.setText(e.message)
+                         progressBar.visibility = View.GONE
+                      //  Toast.makeText(this, e.message!!, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
     }
 
-    fun checkUser(){
-        if (auth?.currentUser != null) {
-            auth!!.currentUser!!.reload()
-        } else {
-            auth?.signInAnonymously()
-                ?.addOnCompleteListener(this,
-                    OnCompleteListener<AuthResult?> { task ->
-                        Log.d("FirebaseAuth", "signInAnonymously:onComplete:" + task.isSuccessful)
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful) {
-                            Log.w("FirebaseAuth", "signInAnonymously", task.exception)
-                            Toast.makeText(
-                                this, "Authentication failed.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        // ...
-                    })
-        }
-    }
 
     private fun verifyEmail() {
         user = auth!!.currentUser;
@@ -375,7 +396,19 @@ class SignUpActivity : AppCompatActivity() {
            )
         db.collection("users").document(enterEmail.text.toString())
             .set(user)
-            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
+            .addOnSuccessListener {
+                errorSignUp.setText(R.string.checkEmail)
+                progressBar.visibility = View.GONE
+                Log.d(TAG, "DocumentSnapshot successfully written!")
+                val alertDialogBuilder = AlertDialog.Builder(this)
+                alertDialogBuilder.setMessage(R.string.checkEmail)
+                    //.setNegativeButton(false)
+                    .setPositiveButton(R.string.signIn) { dialog, id ->
+                        signIn()
+                    }
+                val alert: AlertDialog = alertDialogBuilder.create()
+                alert.show()
+            }
             .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
 
 }
